@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123b32">
+  <title>المرصد الانتخابي</title>
+  <meta name="description" content="المرصد الانتخابي — تنظيم وحجز مواعيد تغطية الأنشطة الانتخابية">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">م</div><div><strong>المرصد الانتخابي</strong><span>حجز مواعيد التغطية</span></div></div>
+  <button id="adminOpen" class="button button-ghost">دخول الإدارة</button>
+</header>
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">تنظيم • تنسيق • متابعة</span>
+      <h1>نظّم مواعيد<br><em>التغطية الانتخابية</em></h1>
+      <p>قدّم طلب موعد لتنسيق تغطية نشاط أو لقاء أو تجمع انتخابي. ستتم مراجعة الطلب من فريق الإدارة، ويصلك تحديث عند تغيير حالته.</p>
+      <div class="hero-points"><span>✓ طلب موعد بسهولة</span><span>✓ متابعة حالة الطلب</span><span>✓ تنسيق مركزي للأنشطة</span></div>
+    </div>
+    <div class="hero-art" aria-hidden="true"><div class="calendar-card"><div class="cal-top">موعد التغطية</div><div class="cal-date">28 <small>نوفمبر</small></div><div class="cal-lines"><i></i><i></i><i></i></div><div class="cal-check">✓</div></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div></div>
+  </section>
+
+  <section class="content-grid">
+    <section class="panel form-panel">
+      <div class="section-heading"><div><span class="eyebrow">طلب جديد</span><h2>احجز موعد تغطية</h2></div><span class="step">01 / 02</span></div>
+      <p class="muted">املأ المعلومات بدقة. إرسال الطلب لا يعني تأكيد الموعد؛ تنتظر الطلبات موافقة الإدارة.</p>
+      <div id="setupNotice" class="notice notice-warning hidden">الموقع في وضع المعاينة. لإتاحة الحجز الفعلي، أكمل إعداد Supabase حسب ملف README_AR.md.</div>
+      <form id="bookingForm">
+        <div class="field-row">
+          <label>الاسم واللقب<input name="full_name" required maxlength="120" autocomplete="name" placeholder="الاسم الكامل"></label>
+          <label>رقم الهاتف<input name="phone" required maxlength="30" autocomplete="tel" placeholder="05 / 06 / 07 ..."></label>
+        </div>
+        <div class="field-row">
+          <label>البريد الإلكتروني (اختياري)<input name="email" type="email" maxlength="160" autocomplete="email" placeholder="name@example.com"></label>
+          <label>صفة طالب التغطية<select name="requester_type" required><option value="">اختر الصفة</option><option>مترشح</option><option>ممثل قائمة انتخابية</option><option>مسؤول إعلام واتصال</option><option>صحفي / وسيلة إعلام</option><option>منسق ميداني</option><option>أخرى</option></select></label>
+        </div>
+        <label>نوع النشاط<select name="activity_type" required><option value="">اختر نوع النشاط</option><option>لقاء جواري</option><option>تجمع انتخابي</option><option>زيارة ميدانية</option><option>تصريح صحفي</option><option>مقابلة / حوار</option><option>نشاط آخر</option></select></label>
+        <div class="field-row">
+          <label>التاريخ المطلوب<input name="appointment_date" type="date" required></label>
+          <label>الساعة المطلوبة<select name="appointment_time" required><option value="">اختر الوقت</option></select></label>
+        </div>
+        <label>المكان / العنوان<input name="location" required maxlength="220" placeholder="البلدية، الحي، أو موقع النشاط"></label>
+        <label>تفاصيل إضافية<textarea name="details" rows="3" maxlength="1200" placeholder="موضوع النشاط، المدة المتوقعة، متطلبات التغطية..."></textarea></label>
+        <label class="consent"><input type="checkbox" required> أؤكد صحة المعلومات وأوافق على استخدامها لتنظيم هذا الطلب.</label>
+        <button class="button button-primary button-wide" type="submit" id="submitBtn">إرسال طلب الموعد <span>←</span></button>
+        <p class="form-footnote">لا ترسل كلمات مرور أو معلومات حساسة عبر هذه الاستمارة.</p>
+      </form>
+      <div id="formMessage" class="notice hidden" role="status" aria-live="polite"></div>
+    </section>
+
+    <aside class="side-column">
+      <section class="panel info-panel">
+        <span class="icon-circle">◷</span><h3>كيف تتم العملية؟</h3>
+        <ol class="process-list"><li><b>إرسال الطلب</b><span>أدخل تفاصيل النشاط والوقت المناسب.</span></li><li><b>مراجعة الإدارة</b><span>يتم التحقق من توفر الفريق والوقت.</span></li><li><b>تأكيد أو اقتراح بديل</b><span>تتغير حالة الطلب بعد المراجعة.</span></li></ol>
+      </section>
+      <section class="panel status-panel">
+        <span class="eyebrow">متابعة الطلب</span><h3>هل أرسلت طلبًا سابقًا؟</h3><p class="muted">أدخل رقم الهاتف لعرض طلباتك بعد تفعيل قاعدة البيانات.</p>
+        <form id="lookupForm"><label>رقم الهاتف<input name="phone" required maxlength="30" placeholder="رقم الهاتف المستخدم في الطلب"></label><button class="button button-secondary button-wide" type="submit">عرض حالة الطلبات</button></form>
+        <div id="lookupResults" class="lookup-results"></div>
+      </section>
+      <div class="privacy-note">🔒 بيانات الطلبات مخصصة لتنظيم التغطية، ويجب أن يقتصر الاطلاع عليها على الأشخاص المخوّلين.</div>
+    </aside>
+  </section>
+</main>
+<footer><span>المرصد الانتخابي — حجز مواعيد التغطية</span><span>واجهة عربية • تصميم متوافق مع الهاتف</span></footer>
+
+<div id="adminModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+  <div class="modal-backdrop" data-close="true"></div>
+  <div class="modal-card">
+    <button class="modal-close" id="adminClose" aria-label="إغلاق">×</button>
+    <div id="loginView">
+      <span class="eyebrow">مساحة محمية</span><h2 id="adminTitle">دخول الإدارة</h2><p class="muted">سجّل الدخول بحساب الإدارة الذي أنشأته في Supabase.</p>
+      <form id="loginForm"><label>البريد الإلكتروني<input name="email" type="email" required autocomplete="username"></label><label>كلمة المرور<input name="password" type="password" required autocomplete="current-password"></label><button class="button button-primary button-wide" type="submit">تسجيل الدخول</button></form>
+      <div id="loginMessage" class="notice hidden"></div>
+    </div>
+    <div id="dashboardView" class="hidden">
+      <div class="dashboard-head"><div><span class="eyebrow">لوحة التحكم</span><h2>طلبات المواعيد</h2></div><button id="logoutBtn" class="button button-ghost">تسجيل الخروج</button></div>
+      <div class="dashboard-tools"><select id="statusFilter"><option value="all">كل الحالات</option><option value="pending">قيد المراجعة</option><option value="approved">مقبول</option><option value="rejected">مرفوض</option><option value="completed">مكتمل</option></select><button id="refreshBtn" class="button button-secondary">تحديث</button></div>
+      <div id="adminMessage" class="notice hidden"></div><div id="appointmentsList" class="appointments-list"></div>
+    </div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {})); }</script>
+</body>
+</html>
